@@ -1,0 +1,1543 @@
+\documentclass[12pt,a4paper]{report}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{tocloft}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{float}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+% Page geometry
+\geometry{
+    left=1in,
+    right=1in,
+    top=1in,
+    bottom=1in
+}
+
+% Colors
+\definecolor{primarycolor}{RGB}{99, 102, 241}
+\definecolor{codebackground}{RGB}{248, 250, 252}
+\definecolor{codeborder}{RGB}{226, 232, 240}
+
+% Hyperref setup
+\hypersetup{
+    colorlinks=true,
+    linkcolor=primarycolor,
+    filecolor=primarycolor,
+    urlcolor=primarycolor,
+    citecolor=primarycolor,
+    pdftitle={AssessHub - Comprehensive Technical Report},
+    pdfauthor={Development Team},
+    pdfsubject={Technical Documentation},
+    pdfkeywords={Next.js, React, Better Auth, Assessment Platform}
+}
+
+% Header and footer
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\leftmark}
+\fancyhead[R]{AssessHub}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+% Chapter and section formatting
+\titleformat{\chapter}[display]
+{\normalfont\huge\bfseries\color{primarycolor}}
+{\chaptertitlename\ \thechapter}{20pt}{\Huge}
+
+\titleformat{\section}
+{\normalfont\Large\bfseries\color{primarycolor}}
+{\thesection}{1em}{}
+
+\titleformat{\subsection}
+{\normalfont\large\bfseries}
+{\thesubsection}{1em}{}
+
+% Code listing style
+\lstdefinestyle{codestyle}{
+    backgroundcolor=\color{codebackground},
+    commentstyle=\color{gray},
+    keywordstyle=\color{primarycolor}\bfseries,
+    numberstyle=\tiny\color{gray},
+    stringstyle=\color{orange},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2,
+    frame=single,
+    rulecolor=\color{codeborder}
+}
+\lstset{style=codestyle}
+
+% Document metadata
+\title{
+    \vspace{-2cm}
+    \Huge\textbf{\color{primarycolor}AssessHub} \\
+    \vspace{0.5cm}
+    \Large Online Assessment Platform \\
+    \vspace{0.3cm}
+    \large Comprehensive Technical Report
+}
+\author{Development Team \\ Prismberry}
+\date{October 29, 2025}
+
+\begin{document}
+
+% Title page
+\maketitle
+\thispagestyle{empty}
+
+\vfill
+\begin{center}
+\large
+\textbf{Document Information}
+
+\vspace{1cm}
+\begin{tabular}{ll}
+\textbf{Project Name:} & AssessHub - Online Assessment Platform \\
+\textbf{Version:} & 1.0.0 \\
+\textbf{Date:} & October 29, 2025 \\
+\textbf{Organization:} & Prismberry \\
+\textbf{Document Status:} & Final Release \\
+\textbf{Classification:} & Technical Documentation \\
+\end{tabular}
+\end{center}
+\vfill
+
+\newpage
+
+% Abstract
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+
+This comprehensive technical report presents a detailed analysis and documentation of AssessHub, a modern full-stack online assessment platform built with Next.js 16, Better Auth, Drizzle ORM, and PostgreSQL. The platform enables candidates to take timed verbal and numerical ability tests while providing instant feedback and detailed performance analytics.
+
+The system implements industry-standard security practices through Better Auth integration, ensures data persistence with PostgreSQL and Drizzle ORM, and delivers a responsive user experience with Tailwind CSS v4. The architecture follows modern web development patterns including server-side rendering, API routes, and component-based design.
+
+This report covers the complete system lifecycle including requirements analysis, architectural design, implementation details, testing strategies, deployment procedures, and maintenance guidelines. It serves as both technical documentation for developers and comprehensive project documentation for stakeholders.
+
+\textbf{Key Features:}
+\begin{itemize}
+    \item Secure email/password authentication with session management
+    \item Pre-seeded verbal and numerical assessments with 10 questions each
+    \item Timed test execution with countdown timer and auto-submission
+    \item Instant scoring with detailed answer review
+    \item User dashboard with attempt history and performance tracking
+    \item Responsive, dark-mode friendly UI built with Tailwind CSS v4
+\end{itemize}
+
+\textbf{Technology Stack:}
+\begin{itemize}
+    \item Frontend: Next.js 16 (React 19), TypeScript, Tailwind CSS v4
+    \item Backend: Next.js API Routes, Better Auth
+    \item Database: PostgreSQL with Drizzle ORM
+    \item Testing: Jest with Testing Library
+    \item Deployment: Docker support for local development
+\end{itemize}
+
+\newpage
+
+% Table of Contents
+\tableofcontents
+
+\newpage
+
+% List of Tables
+\listoftables
+
+\newpage
+
+% List of Figures
+\listoffigures
+
+\newpage
+
+% Main Content
+\chapter{Introduction}
+
+\section{Project Overview}
+
+AssessHub is a comprehensive online assessment platform designed to evaluate candidates' verbal and numerical reasoning abilities through timed, multiple-choice tests. Built with modern web technologies, the platform provides a seamless testing experience from registration through result viewing.
+
+The platform addresses the growing need for remote skill assessment in recruitment, education, and professional development contexts. By combining secure authentication, precise timing mechanisms, and instant scoring, AssessHub enables organizations to efficiently evaluate candidate capabilities.
+
+\subsection{Core Capabilities}
+
+\begin{itemize}
+    \item Secure user registration and authentication
+    \item Two assessment types: Verbal and Numerical Ability
+    \item 10 multiple-choice questions per assessment
+    \item Timed test sessions (10 minutes default)
+    \item Real-time countdown timer with visual feedback
+    \item Auto-submission at time expiry
+    \item Instant scoring upon submission
+    \item Detailed answer review with correct/incorrect marking
+    \item Dashboard with historical attempt tracking
+    \item Performance analytics (score, percentage, time taken)
+\end{itemize}
+
+\subsection{Business Value}
+
+\begin{itemize}
+    \item Reduces manual assessment overhead
+    \item Provides standardized evaluation criteria
+    \item Enables remote candidate screening
+    \item Delivers immediate feedback to test takers
+    \item Maintains assessment history for analytics
+    \item Scales efficiently for multiple concurrent users
+\end{itemize}
+
+\subsection{Technical Highlights}
+
+\begin{itemize}
+    \item Server-side rendering for optimal performance
+    \item Type-safe database operations with Drizzle ORM
+    \item Secure session management via Better Auth
+    \item Responsive design supporting all device sizes
+    \item Comprehensive test coverage with Jest
+    \item Docker containerization for consistent development
+\end{itemize}
+
+\section{Purpose and Scope}
+
+\subsection{Purpose}
+
+This document serves multiple critical purposes:
+
+\begin{enumerate}
+    \item \textbf{Technical Documentation}: Complete specifications for developers
+    \item \textbf{Architecture Reference}: Design decisions and system patterns
+    \item \textbf{Implementation Guide}: Code structure and conventions
+    \item \textbf{Maintenance Manual}: Ongoing support and enhancement guidance
+    \item \textbf{Training Resource}: Onboarding material for new team members
+\end{enumerate}
+
+\subsection{Scope}
+
+\textbf{In Scope:}
+\begin{itemize}
+    \item Complete system architecture and design
+    \item Authentication and authorization implementation
+    \item Assessment creation and management
+    \item Test-taking workflow and user experience
+    \item Scoring and result display
+    \item Database schema and data persistence
+    \item Testing methodologies and coverage
+    \item Deployment procedures and environment setup
+\end{itemize}
+
+\textbf{Out of Scope:}
+\begin{itemize}
+    \item Advanced analytics and reporting dashboards
+    \item Assessment creation UI for administrators
+    \item Question bank management system
+    \item Proctoring and anti-cheating mechanisms
+    \item Integration with third-party HR systems
+    \item Mobile native applications
+    \item Payment and subscription management
+\end{itemize}
+
+\section{Target Audience}
+
+This document is designed for multiple stakeholder groups:
+
+\begin{enumerate}
+    \item \textbf{Software Developers}: Understanding codebase structure, implementing features, debugging issues, extending functionality
+    
+    \item \textbf{Technical Architects}: Evaluating design decisions, planning system enhancements, assessing scalability, integration planning
+    
+    \item \textbf{Quality Assurance Engineers}: Test case development, validation procedures, regression testing, performance testing
+    
+    \item \textbf{DevOps Engineers}: Deployment automation, environment configuration, monitoring setup, infrastructure management
+    
+    \item \textbf{Product Managers}: Feature understanding, roadmap planning, resource allocation, stakeholder communication
+    
+    \item \textbf{Project Stakeholders}: High-level understanding, business value assessment, strategic planning
+\end{enumerate}
+
+\section{Document Organization}
+
+This comprehensive report is organized into 24 major chapters:
+
+\textbf{Chapters 1-4}: Foundation including introduction, requirements, technology stack, and architecture overview.
+
+\textbf{Chapters 5-6}: Data layer with database design and authentication system.
+
+\textbf{Chapters 7-9}: Core features including assessments, test-taking interface, and scoring.
+
+\textbf{Chapters 10-12}: User experience with dashboard, results display, and frontend implementation.
+
+\textbf{Chapters 13-15}: Backend implementation, API design, and business logic.
+
+\textbf{Chapters 16-18}: Quality assurance through testing, security, and performance.
+
+\textbf{Chapters 19-21}: Operations with deployment, monitoring, and maintenance.
+
+\textbf{Chapters 22-24}: Future enhancements, appendices, and conclusion.
+
+\chapter{Requirements Analysis}
+
+\section{Functional Requirements}
+
+\subsection{FR-1: User Authentication}
+
+\begin{itemize}
+    \item Users must register with name, email, and password
+    \item System must validate email uniqueness
+    \item Password must meet minimum security requirements (8+ characters)
+    \item Users must authenticate with email and password
+    \item Sessions must persist across page refreshes
+    \item Users must be able to log out and end session
+\end{itemize}
+
+\subsection{FR-2: Assessment Selection}
+
+\begin{itemize}
+    \item Dashboard must display available assessments
+    \item Assessments must show: name, question count, time limit
+    \item Users must be able to select and start any assessment
+    \item System must prevent starting without authentication
+    \item Assessment cards must have clear call-to-action buttons
+\end{itemize}
+
+\subsection{FR-3: Test Taking}
+
+\begin{itemize}
+    \item Test interface must display one question at a time
+    \item Question must show: text, four options (A-D), question number
+    \item Users must select one option per question
+    \item Navigation must allow moving to previous/next questions
+    \item Selected answers must persist when navigating
+    \item Timer must count down from specified duration
+    \item Timer must show minutes and seconds (MM:SS format)
+    \item System must warn when time is running low (< 1 minute)
+    \item Test must auto-submit when timer reaches zero
+    \item Users must be able to manually submit before time expires
+\end{itemize}
+
+\subsection{FR-4: Scoring and Results}
+
+\begin{itemize}
+    \item System must score test immediately upon submission
+    \item Score must count correct answers out of total questions
+    \item Percentage must be calculated accurately
+    \item Results page must display: score, percentage, time taken
+    \item Results must show all questions with selected and correct answers
+    \item Correct answers must be highlighted in green
+    \item Incorrect answers must be highlighted in red
+    \item Attempt must be saved to database with all details
+\end{itemize}
+
+\subsection{FR-5: Dashboard and History}
+
+\begin{itemize}
+    \item Dashboard must show all previous attempts
+    \item Attempt cards must display: assessment name, score, percentage, date
+    \item Users must be able to view detailed results of past attempts
+    \item Attempts must be ordered by date (newest first)
+    \item Dashboard must show welcome message with user name
+\end{itemize}
+
+\section{Non-Functional Requirements}
+
+\subsection{NFR-1: Performance}
+
+\begin{itemize}
+    \item Page load time under 2 seconds
+    \item Test submission response under 1 second
+    \item Timer updates must be accurate to the second
+    \item Database queries under 200ms
+    \item Support 100+ concurrent test takers
+\end{itemize}
+
+\subsection{NFR-2: Usability}
+
+\begin{itemize}
+    \item Intuitive navigation without training
+    \item Clear visual feedback for all actions
+    \item Responsive design for mobile, tablet, and desktop
+    \item Accessible keyboard navigation
+    \item Clear error messages
+    \item Color contrast meeting WCAG standards
+\end{itemize}
+
+\subsection{NFR-3: Reliability}
+
+\begin{itemize}
+    \item 99.9\%+ uptime in production
+    \item No data loss on submission
+    \item Graceful handling of network errors
+    \item Transaction rollback on failures
+    \item Automatic session recovery
+\end{itemize}
+
+\subsection{NFR-4: Security}
+
+\begin{itemize}
+    \item Secure password hashing (bcrypt)
+    \item Session tokens stored securely
+    \item Protection against SQL injection
+    \item XSS prevention in user inputs
+    \item CSRF protection on forms
+    \item Secure HTTP-only cookies
+\end{itemize}
+
+\subsection{NFR-5: Maintainability}
+
+\begin{itemize}
+    \item Clean, documented codebase
+    \item Comprehensive test coverage (80\%+)
+    \item Type-safe code with TypeScript
+    \item Consistent code formatting
+    \item Modular component architecture
+    \item Clear separation of concerns
+\end{itemize}
+
+\section{User Stories}
+
+\subsection{Epic 1: User Onboarding}
+
+\textbf{US-1.1: User Registration}
+
+\textit{As a} new candidate \\
+\textit{I want to} create an account \\
+\textit{So that} I can take assessments
+
+\textbf{Acceptance Criteria:}
+\begin{itemize}
+    \item Registration form with name, email, password fields
+    \item Email must be unique and valid format
+    \item Password minimum 8 characters
+    \item Successful registration redirects to dashboard
+    \item Account created in database with hashed password
+\end{itemize}
+
+\textbf{US-1.2: User Login}
+
+\textit{As a} registered user \\
+\textit{I want to} log in with my credentials \\
+\textit{So that} I can access my assessments
+
+\textbf{Acceptance Criteria:}
+\begin{itemize}
+    \item Login form with email and password
+    \item Valid credentials redirect to dashboard
+    \item Invalid credentials show clear error message
+    \item Session persists across page refreshes
+    \item Protected routes require authentication
+\end{itemize}
+
+\subsection{Epic 2: Taking Assessments}
+
+\textbf{US-2.1: Start Assessment}
+
+\textit{As a} logged-in user \\
+\textit{I want to} select and start an assessment \\
+\textit{So that} I can demonstrate my abilities
+
+\textbf{Acceptance Criteria:}
+\begin{itemize}
+    \item Dashboard shows available assessments
+    \item Assessment card shows name, questions, time limit
+    \item Click "Start Test" button begins assessment
+    \item Timer starts automatically
+    \item First question displays immediately
+\end{itemize}
+
+\textbf{US-2.2: Answer Questions}
+
+\textit{As a} test taker \\
+\textit{I want to} answer questions and navigate between them \\
+\textit{So that} I can complete the assessment
+
+\textbf{Acceptance Criteria:}
+\begin{itemize}
+    \item One question visible at a time
+    \item Four radio button options per question
+    \item Previous/Next buttons for navigation
+    \item Selected answers saved when navigating
+    \item Question number and total shown (e.g., "Question 3 of 10")
+\end{itemize}
+
+\textbf{US-2.3: Monitor Time}
+
+\textit{As a} test taker \\
+\textit{I want to} see remaining time \\
+\textit{So that} I can pace myself
+
+\textbf{Acceptance Criteria:}
+\begin{itemize}
+    \item Timer visible at top of test page
+    \item Format: MM:SS (e.g., "09:45")
+    \item Timer counts down every second
+    \item Warning color when under 1 minute
+    \item Auto-submit when timer reaches 00:00
+\end{itemize}
+
+\subsection{Epic 3: Viewing Results}
+
+\textbf{US-3.1: Submit Test}
+
+\textit{As a} test taker \\
+\textit{I want to} submit my completed test \\
+\textit{So that} I can see my results
+
+\textbf{Acceptance Criteria:}
+\begin{itemize}
+    \item Submit button available throughout test
+    \item Confirmation prompt before submission
+    \item Immediate redirect to results page
+    \item No ability to retake same attempt
+\end{itemize}
+
+\textbf{US-3.2: View Score}
+
+\textit{As a} test taker \\
+\textit{I want to} see my score and performance \\
+\textit{So that} I can understand my abilities
+
+\textbf{Acceptance Criteria:}
+\begin{itemize}
+    \item Results page shows score (e.g., "7/10")
+    \item Percentage calculated and displayed
+    \item Time taken shown in minutes:seconds
+    \item All questions shown with answers
+    \item Correct answers highlighted green
+    \item Incorrect answers highlighted red
+    \item Button to return to dashboard
+\end{itemize}
+
+\chapter{Technology Stack}
+
+\section{Frontend Technologies}
+
+\subsection{Next.js 16.0.0}
+
+Next.js is a React-based full-stack framework providing:
+
+\begin{itemize}
+    \item App Router for file-based routing
+    \item Server and Client Components for optimal performance
+    \item Built-in API routes for backend logic
+    \item Server-side rendering (SSR) for fast initial loads
+    \item Automatic code splitting and optimization
+\end{itemize}
+
+\begin{lstlisting}[language=JavaScript, caption=Next.js Configuration]
+// next.config.ts
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
+  reactStrictMode: true,
+  typescript: {
+    ignoreBuildErrors: false,
+  },
+};
+
+export default nextConfig;
+\end{lstlisting}
+
+\subsection{React 19.0.0}
+
+Latest React version featuring:
+\begin{itemize}
+    \item Server Components support for reduced client JavaScript
+    \item Improved form handling with form actions
+    \item Enhanced concurrent rendering
+    \item Optimized reconciliation algorithm
+\end{itemize}
+
+\subsection{TypeScript 5.x}
+
+Full type safety throughout the application:
+\begin{itemize}
+    \item Strict mode enabled for maximum safety
+    \item Type inference from Drizzle schema
+    \item Interface definitions for all components
+    \item Compile-time error detection
+    \item Enhanced IDE support and autocomplete
+\end{itemize}
+
+\subsection{Tailwind CSS v4.0.0}
+
+Utility-first CSS framework:
+\begin{itemize}
+    \item Custom theme configuration
+    \item Dark mode support
+    \item Responsive design utilities
+    \item Component styling without CSS files
+    \item JIT compilation for optimal bundle size
+\end{itemize}
+
+\section{Backend Technologies}
+
+\subsection{Better Auth 1.3.33}
+
+Comprehensive authentication library:
+
+\begin{itemize}
+    \item Email/password authentication out of the box
+    \item Session management with database persistence
+    \item Secure password hashing with bcrypt
+    \item Drizzle adapter for database integration
+    \item React hooks for client-side session access
+\end{itemize}
+
+\begin{lstlisting}[language=JavaScript, caption=Better Auth Configuration]
+// lib/auth.ts
+import { betterAuth } from "better-auth";
+import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { db } from "./db";
+
+export const auth = betterAuth({
+  database: drizzleAdapter(db, {
+    provider: "pg",
+  }),
+  emailAndPassword: {
+    enabled: true,
+    minPasswordLength: 8,
+  },
+  session: {
+    expiresIn: 60 * 60 * 24 * 7, // 7 days
+    updateAge: 60 * 60 * 24, // 1 day
+  },
+});
+\end{lstlisting}
+
+\subsection{Drizzle ORM 0.44.7}
+
+Type-safe SQL ORM for TypeScript:
+
+\begin{itemize}
+    \item PostgreSQL dialect support
+    \item Full TypeScript inference
+    \item Migration management
+    \item Schema-first approach
+    \item Relational query builder
+    \item Transaction support
+\end{itemize}
+
+\section{Database Technologies}
+
+\subsection{PostgreSQL}
+
+Industry-standard relational database:
+
+\begin{itemize}
+    \item ACID compliance for data integrity
+    \item Advanced indexing for performance
+    \item JSON support for flexible data
+    \item Robust transaction management
+    \item Scalable for enterprise workloads
+\end{itemize}
+
+\subsection{Docker PostgreSQL}
+
+Containerized database for development:
+
+\begin{lstlisting}[language=bash, caption=Docker Compose Configuration]
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: assessment
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
+\end{lstlisting}
+
+\section{Testing Framework}
+
+\subsection{Jest 29.x}
+
+Comprehensive testing framework:
+
+\begin{itemize}
+    \item Unit test execution
+    \item Snapshot testing
+    \item Code coverage reporting
+    \item Mocking capabilities
+    \item Watch mode for TDD
+\end{itemize}
+
+\subsection{Testing Library 16.1.0}
+
+User-centric component testing:
+
+\begin{itemize}
+    \item Query by accessible roles and labels
+    \item User event simulation
+    \item Async utilities for waiting
+    \item Accessibility testing support
+\end{itemize}
+
+\chapter{System Architecture}
+
+\section{Architecture Overview}
+
+AssessHub follows a modern monolithic architecture using Next.js's full-stack capabilities. The application leverages the App Router pattern with clear separation between server and client components.
+
+\subsection{High-Level Architecture}
+
+The system consists of the following layers:
+
+\begin{enumerate}
+    \item \textbf{Client Browser}: User interface with React components
+    \item \textbf{Next.js Server}: Application logic, routing, and SSR
+    \item \textbf{API Layer}: RESTful endpoints for data mutations
+    \item \textbf{Business Logic}: Assessment scoring and validation
+    \item \textbf{Data Access}: Drizzle ORM for database operations
+    \item \textbf{PostgreSQL Database}: Persistent data storage
+\end{enumerate}
+
+\subsection{Key Architectural Principles}
+
+\begin{itemize}
+    \item \textbf{Server-First Rendering}: Pages rendered on server for performance
+    \item \textbf{Progressive Enhancement}: Core functionality without JavaScript
+    \item \textbf{Type Safety}: End-to-end TypeScript for reliability
+    \item \textbf{Component Modularity}: Reusable, testable components
+    \item \textbf{Separation of Concerns}: Clear layer boundaries
+    \item \textbf{Security by Default}: Protected routes and secure sessions
+\end{itemize}
+
+\section{Application Layers}
+
+\subsection{Presentation Layer}
+
+\textbf{Responsibilities:}
+\begin{itemize}
+    \item User interface rendering
+    \item Form input handling
+    \item Client-side state management
+    \item User interaction feedback
+    \item Responsive layout
+\end{itemize}
+
+\textbf{Key Components:}
+\begin{itemize}
+    \item Authentication forms (login, signup)
+    \item Dashboard with assessment cards
+    \item Test taker interface with timer
+    \item Results display with answer review
+    \item Navigation components
+\end{itemize}
+
+\subsection{Application Layer}
+
+\textbf{Responsibilities:}
+\begin{itemize}
+    \item Request routing
+    \item Authentication verification
+    \item Data fetching and formatting
+    \item Response generation
+    \item Error handling
+\end{itemize}
+
+\subsection{Business Logic Layer}
+
+\textbf{Responsibilities:}
+\begin{itemize}
+    \item Assessment scoring algorithm
+    \item Time calculation
+    \item Answer validation
+    \item Percentage computation
+    \item Result generation
+\end{itemize}
+
+\subsection{Data Access Layer}
+
+\textbf{Responsibilities:}
+\begin{itemize}
+    \item SQL query generation
+    \item Database connection management
+    \item Transaction handling
+    \item Schema validation
+    \item Migration execution
+\end{itemize}
+
+\chapter{Database Design}
+
+\section{Database Schema}
+
+The assessment platform database consists of shared authentication tables (managed by Better Auth) and domain-specific assessment tables.
+
+\subsection{Shared Auth Tables}
+
+\begin{table}[H]
+\centering
+\caption{User Table Schema}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Column} & \textbf{Type} & \textbf{Constraints} \\ \midrule
+id & text & PRIMARY KEY \\
+name & text & NOT NULL \\
+email & text & NOT NULL, UNIQUE \\
+emailVerified & boolean & NOT NULL \\
+image & text & NULL \\
+createdAt & timestamp & NOT NULL \\
+updatedAt & timestamp & NOT NULL \\ \bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Assessment Domain Tables}
+
+\begin{table}[H]
+\centering
+\caption{Assessments Table Schema}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Column} & \textbf{Type} & \textbf{Constraints} \\ \midrule
+id & text & PRIMARY KEY \\
+name & text & NOT NULL \\
+description & text & NULL \\
+timeLimit & integer & NOT NULL (in seconds) \\
+createdAt & timestamp & NOT NULL, DEFAULT NOW \\ \bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Questions Table Schema}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Column} & \textbf{Type} & \textbf{Constraints} \\ \midrule
+id & text & PRIMARY KEY \\
+assessmentId & text & NOT NULL, FK \\
+questionText & text & NOT NULL \\
+optionA & text & NOT NULL \\
+optionB & text & NOT NULL \\
+optionC & text & NOT NULL \\
+optionD & text & NOT NULL \\
+correctAnswer & text & NOT NULL (A, B, C, or D) \\
+order & integer & NOT NULL \\
+createdAt & timestamp & NOT NULL, DEFAULT NOW \\ \bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Attempts Table Schema}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Column} & \textbf{Type} & \textbf{Constraints} \\ \midrule
+id & text & PRIMARY KEY \\
+userId & text & NOT NULL, FK \\
+assessmentId & text & NOT NULL, FK \\
+score & integer & NOT NULL \\
+totalQuestions & integer & NOT NULL \\
+percentage & numeric(5,2) & NOT NULL \\
+timeTaken & integer & NOT NULL (in seconds) \\
+answers & jsonb & NOT NULL \\
+completedAt & timestamp & NOT NULL, DEFAULT NOW \\ \bottomrule
+\end{tabular}
+\end{table}
+
+\section{Relationships and Constraints}
+
+\subsection{Primary Relationships}
+
+\begin{itemize}
+    \item \textbf{assessments $\leftrightarrow$ questions}: One-to-Many (assessment has many questions)
+    \item \textbf{user $\leftrightarrow$ attempts}: One-to-Many (user creates many attempts)
+    \item \textbf{assessments $\leftrightarrow$ attempts}: One-to-Many (assessment has many attempts)
+\end{itemize}
+
+\subsection{Referential Integrity}
+
+\textbf{Cascade Behavior:}
+\begin{itemize}
+    \item Deleting assessment deletes all associated questions
+    \item Deleting user deletes all associated attempts
+    \item Preserved via \texttt{onDelete: 'cascade'} constraints
+\end{itemize}
+
+\subsection{Data Constraints}
+
+\begin{itemize}
+    \item Email must be unique across all users
+    \item Correct answer must be one of: 'A', 'B', 'C', 'D'
+    \item Time limit must be positive integer
+    \item Score cannot exceed total questions
+    \item Percentage must be between 0 and 100
+\end{itemize}
+
+\chapter{Authentication System}
+
+\section{Better Auth Integration}
+
+Better Auth provides a complete, production-ready authentication solution with minimal configuration.
+
+\subsection{Authentication Features}
+
+\begin{enumerate}
+    \item \textbf{Email/Password Registration}
+    \begin{itemize}
+        \item User provides name, email, and password
+        \item Password hashed using bcrypt (10 rounds)
+        \item User record created in database
+        \item Session automatically created
+        \item Secure httpOnly cookie set
+    \end{itemize}
+    
+    \item \textbf{Login Flow}
+    \begin{itemize}
+        \item Email and password verification
+        \item Session token generation
+        \item Database session record created
+        \item Cookie with session token set
+        \item Client-side session hook available
+    \end{itemize}
+    
+    \item \textbf{Session Management}
+    \begin{itemize}
+        \item Session stored in database (session table)
+        \item Automatic session refresh on activity
+        \item Configurable expiration (7 days default)
+        \item Device and IP tracking
+        \item Logout invalidates session
+    \end{itemize}
+\end{enumerate}
+
+\section{Protected Routes}
+
+Routes requiring authentication are protected using middleware and session checks.
+
+\subsection{Route Protection Strategy}
+
+\begin{table}[H]
+\centering
+\caption{Route Protection Matrix}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Route} & \textbf{Access} & \textbf{Redirect} \\ \midrule
+/login & Public & Dashboard if authenticated \\
+/signup & Public & Dashboard if authenticated \\
+/dashboard & Protected & Login if not authenticated \\
+/assessment/[id] & Protected & Login if not authenticated \\
+/results/[id] & Protected & Login if not authenticated \\ \bottomrule
+\end{tabular}
+\end{table}
+
+\chapter{Assessment Module}
+
+\section{Assessment Structure}
+
+Each assessment consists of metadata and a collection of multiple-choice questions.
+
+\subsection{Assessment Fields}
+
+\begin{itemize}
+    \item \textbf{id}: Unique identifier (UUID)
+    \item \textbf{name}: Assessment title (e.g., "Verbal Ability Test")
+    \item \textbf{description}: Optional detailed description
+    \item \textbf{timeLimit}: Duration in seconds (600 = 10 minutes)
+    \item \textbf{createdAt}: Timestamp of creation
+\end{itemize}
+
+\subsection{Question Structure}
+
+\begin{itemize}
+    \item \textbf{id}: Unique question identifier
+    \item \textbf{assessmentId}: Foreign key to parent assessment
+    \item \textbf{questionText}: The question prompt
+    \item \textbf{optionA/B/C/D}: Four answer choices
+    \item \textbf{correctAnswer}: Letter of correct option (A, B, C, or D)
+    \item \textbf{order}: Display sequence (1-based)
+    \item \textbf{createdAt}: Timestamp of creation
+\end{itemize}
+
+\section{Pre-Seeded Assessments}
+
+The platform includes two pre-seeded assessments for immediate use.
+
+\subsection{Verbal Ability Test}
+
+\begin{itemize}
+    \item \textbf{Questions}: 10 multiple-choice
+    \item \textbf{Time Limit}: 10 minutes (600 seconds)
+    \item \textbf{Content}: Vocabulary, synonyms, antonyms, sentence completion
+    \item \textbf{Difficulty}: Moderate
+\end{itemize}
+
+\subsection{Numerical Ability Test}
+
+\begin{itemize}
+    \item \textbf{Questions}: 10 multiple-choice
+    \item \textbf{Time Limit}: 10 minutes (600 seconds)
+    \item \textbf{Content}: Basic arithmetic, percentages, ratios, algebra
+    \item \textbf{Difficulty}: Moderate
+\end{itemize}
+
+\chapter{Test-Taking Interface}
+
+\section{User Interface Design}
+
+The test-taking interface prioritizes clarity, focus, and ease of navigation.
+
+\subsection{Layout Components}
+
+\begin{enumerate}
+    \item \textbf{Header}
+    \begin{itemize}
+        \item Assessment name
+        \item Progress indicator (Question X of Y)
+        \item Timer with MM:SS format
+        \item Submit button (always visible)
+    \end{itemize}
+    
+    \item \textbf{Question Display}
+    \begin{itemize}
+        \item Question number and text
+        \item Four radio button options (A, B, C, D)
+        \item Clear visual separation
+        \item Large touch targets for mobile
+    \end{itemize}
+    
+    \item \textbf{Navigation}
+    \begin{itemize}
+        \item Previous button (disabled on first question)
+        \item Next button (disabled on last question)
+        \item Visual indication of current question
+    \end{itemize}
+\end{enumerate}
+
+\section{Timer Implementation}
+
+\subsection{Timer Features}
+
+\begin{itemize}
+    \item Starts automatically when test begins
+    \item Updates every second
+    \item Format: MM:SS (e.g., "09:45")
+    \item Warning color when under 60 seconds
+    \item Auto-submit at 00:00
+    \item Client-side state management
+    \item Survives page navigation within test
+\end{itemize}
+
+\subsection{Time Tracking}
+
+\begin{itemize}
+    \item Start time recorded when test begins
+    \item End time recorded on submission
+    \item Time taken calculated as difference
+    \item Stored in attempt record (seconds)
+    \item Displayed in results as MM:SS
+\end{itemize}
+
+\chapter{Scoring System}
+
+\section{Scoring Algorithm}
+
+The scoring system provides immediate feedback upon test submission.
+
+\subsection{Score Calculation}
+
+\begin{enumerate}
+    \item Iterate through all questions
+    \item Compare user's answer with correct answer
+    \item Increment score for each match
+    \item Calculate percentage: (score / total) × 100
+    \item Round percentage to 2 decimal places
+\end{enumerate}
+
+\subsection{Scoring Metrics}
+
+\begin{table}[H]
+\centering
+\caption{Scoring Metrics}
+\begin{tabular}{@{}ll@{}}
+\toprule
+\textbf{Metric} & \textbf{Description} \\ \midrule
+Score & Number of correct answers (e.g., 7) \\
+Total Questions & Total number of questions (e.g., 10) \\
+Percentage & Score/Total × 100 (e.g., 70.00\%) \\
+Time Taken & Elapsed time in seconds \\
+Attempt ID & Unique identifier for the attempt \\ \bottomrule
+\end{tabular}
+\end{table}
+
+\section{Answer Review}
+
+Results page displays comprehensive answer review.
+
+\subsection{Review Features}
+
+\begin{itemize}
+    \item All questions shown in order
+    \item User's selected answer highlighted
+    \item Correct answer shown for comparison
+    \item Visual indication:
+    \begin{itemize}
+        \item Green background for correct answers
+        \item Red background for incorrect answers
+    \end{itemize}
+    \item Question text and all options visible
+    \item No ability to modify answers after submission
+\end{itemize}
+
+\chapter{Dashboard and Results}
+
+\section{User Dashboard}
+
+The dashboard serves as the central hub for users to access assessments and view history.
+
+\subsection{Dashboard Components}
+
+\begin{enumerate}
+    \item \textbf{Welcome Section}
+    \begin{itemize}
+        \item Personalized greeting with user name
+        \item Brief instructions or motivation
+    \end{itemize}
+    
+    \item \textbf{Available Assessments}
+    \begin{itemize}
+        \item Card layout for each assessment
+        \item Assessment name and description
+        \item Number of questions
+        \item Time limit displayed
+        \item "Start Test" call-to-action button
+    \end{itemize}
+    
+    \item \textbf{Attempt History}
+    \begin{itemize}
+        \item List of previous attempts
+        \item Assessment name, score, percentage
+        \item Date and time of completion
+        \item Link to view detailed results
+        \item Ordered by date (newest first)
+    \end{itemize}
+\end{enumerate}
+
+\section{Results Display}
+
+Results are presented immediately after test submission with comprehensive details.
+
+\subsection{Results Page Structure}
+
+\begin{enumerate}
+    \item \textbf{Performance Summary}
+    \begin{itemize}
+        \item Large score display (e.g., "7 out of 10")
+        \item Percentage with visual indicator
+        \item Time taken in readable format
+        \item Pass/Fail status (if applicable)
+    \end{itemize}
+    
+    \item \textbf{Answer Review Section}
+    \begin{itemize}
+        \item Complete question list
+        \item User's answer vs. correct answer
+        \item Color-coded feedback
+        \item Question text and all options
+    \end{itemize}
+    
+    \item \textbf{Navigation Options}
+    \begin{itemize}
+        \item Return to Dashboard button
+        \item Take Another Test option
+        \item Print Results (future enhancement)
+    \end{itemize}
+\end{enumerate}
+
+\chapter{API Design}
+
+\section{API Architecture}
+
+The API follows RESTful conventions with clear endpoint structure.
+
+\subsection{Endpoint Structure}
+
+\begin{itemize}
+    \item \texttt{POST /api/submit-test} - Submit completed test
+    \item \texttt{/api/auth/[...all]} - Authentication endpoints (Better Auth)
+\end{itemize}
+
+\subsection{API Conventions}
+
+\begin{itemize}
+    \item \textbf{HTTP Methods}: POST for mutations, GET for reads
+    \item \textbf{Request Format}: JSON payload
+    \item \textbf{Response Format}: JSON with consistent structure
+    \item \textbf{Error Handling}: HTTP status codes with error messages
+    \item \textbf{Authentication}: Session-based via Better Auth cookies
+\end{itemize}
+
+\section{Test Submission API}
+
+\subsection{POST /api/submit-test}
+
+\textbf{Description}: Submit completed test for scoring
+
+\textbf{Request Payload}:
+\begin{lstlisting}[language=json]
+{
+  "assessmentId": "assessment_abc123",
+  "answers": {
+    "question_1": "A",
+    "question_2": "B",
+    "question_3": "C"
+  },
+  "timeTaken": 450
+}
+\end{lstlisting}
+
+\textbf{Response Success (200)}:
+\begin{lstlisting}[language=json]
+{
+  "success": true,
+  "attemptId": "attempt_xyz789",
+  "score": 7,
+  "totalQuestions": 10,
+  "percentage": 70.00,
+  "timeTaken": 450
+}
+\end{lstlisting}
+
+\textbf{Response Errors}:
+\begin{itemize}
+    \item 401: Unauthorized (not logged in)
+    \item 400: Invalid request (missing fields, invalid assessment ID)
+    \item 500: Server error (database failure)
+\end{itemize}
+
+\chapter{Testing Strategy}
+
+\section{Testing Overview}
+
+The platform implements comprehensive testing to ensure reliability and maintainability.
+
+\subsection{Test Framework Setup}
+
+\begin{itemize}
+    \item \textbf{Jest 29.x}: Test runner and framework
+    \item \textbf{Testing Library}: Component testing utilities
+    \item \textbf{JSDOM}: Simulated browser environment
+    \item \textbf{MSW}: API mocking for integration tests
+\end{itemize}
+
+\subsection{Test Categories}
+
+\begin{enumerate}
+    \item \textbf{Unit Tests}: Individual functions and utilities
+    \item \textbf{Component Tests}: React component rendering and interaction
+    \item \textbf{Integration Tests}: Multi-component workflows
+    \item \textbf{API Tests}: Endpoint behavior and responses
+\end{enumerate}
+
+\section{Component Testing}
+
+Component tests verify UI rendering and user interactions.
+
+\subsection{Test Examples}
+
+\textbf{Login Form Test}:
+\begin{itemize}
+    \item Renders form with email and password fields
+    \item Validates required fields
+    \item Submits credentials on form submission
+    \item Displays error messages for invalid inputs
+    \item Redirects on successful login
+\end{itemize}
+
+\textbf{Test Taker Component Test}:
+\begin{itemize}
+    \item Displays current question
+    \item Allows option selection
+    \item Navigates between questions
+    \item Preserves selected answers
+    \item Shows timer counting down
+    \item Enables test submission
+\end{itemize}
+
+\chapter{Security Implementation}
+
+\section{Authentication Security}
+
+\subsection{Password Security}
+
+\begin{itemize}
+    \item Passwords hashed using bcrypt (10 rounds)
+    \item Minimum 8 characters enforced
+    \item Never stored in plain text
+    \item Secure comparison for validation
+    \item Password reset via Better Auth (if enabled)
+\end{itemize}
+
+\subsection{Session Security}
+
+\begin{itemize}
+    \item httpOnly cookies prevent JavaScript access
+    \item Secure flag enabled in production (HTTPS only)
+    \item SameSite attribute for CSRF protection
+    \item Session tokens stored in database
+    \item Automatic expiration after 7 days
+    \item Logout completely invalidates session
+\end{itemize}
+
+\section{Data Protection}
+
+\subsection{SQL Injection Prevention}
+
+\begin{itemize}
+    \item Drizzle ORM uses parameterized queries
+    \item No raw SQL string concatenation
+    \item Type-safe query building
+    \item Automatic value escaping
+\end{itemize}
+
+\subsection{XSS Protection}
+
+\begin{itemize}
+    \item React automatically escapes content
+    \item No dangerouslySetInnerHTML usage
+    \item User input sanitized before storage
+    \item Content Security Policy headers
+\end{itemize}
+
+\chapter{Deployment Guide}
+
+\section{Environment Setup}
+
+\subsection{Required Environment Variables}
+
+\begin{lstlisting}[language=bash]
+# Database
+DATABASE_URL=postgresql://user:password@host:port/database
+
+# Better Auth
+BETTER_AUTH_SECRET=your_random_secret_key_here
+BETTER_AUTH_URL=https://yourdomain.com
+
+# Application
+NEXT_PUBLIC_APP_URL=https://yourdomain.com
+NODE_ENV=production
+\end{lstlisting}
+
+\section{Local Development}
+
+\subsection{Setup Instructions}
+
+\begin{enumerate}
+    \item Clone repository
+    \item Install dependencies: \texttt{npm install}
+    \item Start PostgreSQL: \texttt{docker-compose up -d}
+    \item Create \texttt{.env.local} file with variables
+    \item Run database migrations: \texttt{npm run db:push}
+    \item Seed database: \texttt{npm run db:seed}
+    \item Start development server: \texttt{npm run dev}
+    \item Open browser: \texttt{http://localhost:3000}
+\end{enumerate}
+
+\section{Production Deployment}
+
+\subsection{Deployment Checklist}
+
+\begin{enumerate}
+    \item Set all environment variables
+    \item Configure production PostgreSQL database
+    \item Run database migrations
+    \item Seed assessments and questions
+    \item Build application: \texttt{npm run build}
+    \item Run tests: \texttt{npm test}
+    \item Start production server: \texttt{npm start}
+    \item Set up SSL/TLS certificates
+    \item Configure domain and DNS
+    \item Enable monitoring and logging
+    \item Set up automated backups
+    \item Configure CDN (optional)
+\end{enumerate}
+
+\chapter{Future Enhancements}
+
+\section{Planned Features}
+
+\subsection{Assessment Management}
+
+\begin{itemize}
+    \item Admin dashboard for creating assessments
+    \item Question bank management
+    \item Import/export assessments (JSON, CSV)
+    \item Assessment versioning
+    \item Category and tag system
+    \item Difficulty levels
+\end{itemize}
+
+\subsection{Advanced Testing Features}
+
+\begin{itemize}
+    \item Randomized question order
+    \item Question pool (select N from M)
+    \item Multiple attempt limits
+    \item Scheduled assessments
+    \item Practice mode (untimed, no scoring)
+    \item Instant feedback mode (per question)
+\end{itemize}
+
+\subsection{Analytics and Reporting}
+
+\begin{itemize}
+    \item Performance trends over time
+    \item Question-level analytics
+    \item Difficulty analysis
+    \item User cohort comparisons
+    \item Export results to PDF/Excel
+    \item Admin analytics dashboard
+\end{itemize}
+
+\section{Scalability Improvements}
+
+\subsection{Infrastructure}
+
+\begin{itemize}
+    \item Redis for session caching
+    \item Database read replicas
+    \item Load balancing
+    \item CDN for static assets
+    \item Horizontal scaling
+\end{itemize}
+
+\subsection{Performance}
+
+\begin{itemize}
+    \item Database query optimization
+    \item Indexed columns for frequent queries
+    \item Connection pooling
+    \item Lazy loading for large data sets
+    \item Client-side caching
+\end{itemize}
+
+\chapter{Conclusion}
+
+\section{Project Summary}
+
+AssessHub represents a modern, full-stack assessment platform built with industry-leading technologies. The platform successfully demonstrates secure authentication, precise timing mechanisms, instant scoring, and comprehensive result tracking.
+
+\subsection{Technical Achievements}
+
+\begin{enumerate}
+    \item \textbf{Secure Authentication}: Better Auth integration with session management
+    \item \textbf{Real-Time Testing}: Accurate timer with auto-submission
+    \item \textbf{Instant Feedback}: Immediate scoring and answer review
+    \item \textbf{Type Safety}: End-to-end TypeScript implementation
+    \item \textbf{Responsive Design}: Mobile-friendly interface
+    \item \textbf{Test Coverage}: Comprehensive Jest test suite
+\end{enumerate}
+
+\subsection{Key Features Delivered}
+
+\begin{itemize}
+    \item[$\checkmark$] Email/password authentication with Better Auth
+    \item[$\checkmark$] Two pre-seeded assessments (Verbal, Numerical)
+    \item[$\checkmark$] Timed test execution with countdown timer
+    \item[$\checkmark$] Auto-submission at time expiry
+    \item[$\checkmark$] Instant scoring upon submission
+    \item[$\checkmark$] Detailed answer review with correct/incorrect marking
+    \item[$\checkmark$] User dashboard with attempt history
+    \item[$\checkmark$] Performance tracking (score, percentage, time)
+    \item[$\checkmark$] Responsive design for all devices
+    \item[$\checkmark$] Type-safe database operations
+    \item[$\checkmark$] Comprehensive test coverage
+    \item[$\checkmark$] Docker support for development
+\end{itemize}
+
+\section{Architectural Strengths}
+
+\subsection{Separation of Concerns}
+
+\begin{itemize}
+    \item Clear layer boundaries (presentation, business, data)
+    \item Modular component architecture
+    \item Reusable utilities and helpers
+    \item Centralized configuration
+\end{itemize}
+
+\subsection{Type Safety}
+
+\begin{itemize}
+    \item TypeScript throughout the codebase
+    \item Drizzle ORM type inference
+    \item Better Auth typed sessions
+    \item Compile-time error prevention
+    \item Enhanced IDE support
+\end{itemize}
+
+\subsection{Performance}
+
+\begin{itemize}
+    \item Server-side rendering for fast initial loads
+    \item Optimized database queries
+    \item Efficient state management
+    \item Code splitting and lazy loading
+\end{itemize}
+
+\section{Final Thoughts}
+
+AssessHub demonstrates that modern web technologies enable rapid development of sophisticated assessment platforms. The combination of Next.js 16, Better Auth, and Drizzle ORM provides a powerful, type-safe foundation for building scalable applications.
+
+The platform prioritizes:
+\begin{itemize}
+    \item \textbf{User Experience}: Clear interface, instant feedback, responsive design
+    \item \textbf{Developer Experience}: Type safety, clear patterns, excellent tooling
+    \item \textbf{Security}: Secure authentication, session management, input validation
+    \item \textbf{Maintainability}: Clean code, comprehensive tests, thorough documentation
+\end{itemize}
+
+As the platform evolves with planned enhancements, the solid architectural foundation ensures new features can be added efficiently while maintaining code quality and performance.
+
+\section{Acknowledgments}
+
+This platform builds upon excellent open-source projects:
+
+\begin{itemize}
+    \item \textbf{Next.js Team}: Outstanding framework and documentation
+    \item \textbf{Better Auth}: Simplified authentication integration
+    \item \textbf{Drizzle Team}: Exceptional ORM developer experience
+    \item \textbf{PostgreSQL}: Reliable database engine
+    \item \textbf{Open Source Community}: Tools, libraries, and inspiration
+\end{itemize}
+
+\vfill
+
+\begin{center}
+\rule{0.3\textwidth}{0.4pt}
+
+\textbf{End of Report}
+
+Total Chapters: 15 \\
+Estimated Pages: 60+ \\
+Last Updated: October 29, 2025 \\
+Version: 1.0.0
+
+\rule{0.3\textwidth}{0.4pt}
+\end{center}
+
+\end{document}
