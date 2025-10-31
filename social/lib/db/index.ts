@@ -15,7 +15,10 @@ if (!connectionString) {
   throw new Error("DATABASE_URL is not set in the environment variables");
 }
 
-const pool = new Pool({ connectionString });
+const pool = new Pool({ 
+  connectionString,
+  ssl: false // Disable SSL for local/development database connections
+});
 
 export const db = drizzle(pool, { schema });
 export { pool };
